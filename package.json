@@ -1,0 +1,19 @@
+{
+  "name": "fluffytail",
+  "version": "1.0.0",
+  "description": "Fluffy tail bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "fluf"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JrnJ/FluffyTail.git"
+  },
+  "author": "JeroenJ",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JrnJ/FluffyTail/issues"
+  },
+  "homepage": "https://github.com/JrnJ/FluffyTail#readme"
+}

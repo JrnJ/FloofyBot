@@ -14,6 +14,7 @@ const MochiGifUrls = [
     "https://tenor.com/view/mudoh-gif-22823658", // Pan Chase
     "https://tenor.com/view/rosycheeks-approved-i-approve-well-done-good-job-gif-16996150", // Spinning thumbs
     "https://tenor.com/view/mochi-mochimochi-gif-25099262", // Eating fish
+    "https://tenor.com/view/oh-yeah-mochi-peach-cat-corean-gif-24678746", // oh yeah
 ];
 
 module.exports = {

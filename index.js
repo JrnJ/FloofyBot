@@ -1,10 +1,24 @@
 // Require the necessary discord.js classes
 const fs = require('node:fs');
-const { Client, Collection, Intents } = require('discord.js');
-const { token } = require('./config.json');
+const {
+	Client,
+	Collection,
+	Intents
+} = require('discord.js');
+const {
+	token
+} = require('./config.json');
 
 // Create a new client instance
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const client = new Client({
+	intents: [
+		Intents.FLAGS.GUILDS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_MESSAGES,
+	],
+	partials: [
+		'MESSAGE', 'REACTION',
+		'CHANNEL',
+	]
+});
 
 // Get Commands
 client.commands = new Collection();
@@ -45,7 +59,10 @@ client.on('interactionCreate', async interaction => {
 		await command.execute(interaction);
 	} catch (error) {
 		console.error(error);
-		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+		await interaction.reply({
+			content: 'There was an error while executing this command!',
+			ephemeral: true
+		});
 	}
 });
 

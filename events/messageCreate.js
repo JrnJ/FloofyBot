@@ -1,6 +1,21 @@
+class Conversation {
+    constructor(userId, type) {
+        this.userId = userId;
+        this.type = type;
+    }
+};
+
+// Conversation Types
+const ConversationType = {
+    None: 0,
+    AskedMood: 1,
+    AskedForHelp: 2
+}
+
 const {
     clientId,
     bannedChannels,
+    bannedUsers,
     ownerId
 } = require('../config.json');
 
@@ -15,8 +30,16 @@ module.exports = {
             return;
         }
 
+        // Check banned channels
         for (let i = 0; i < bannedChannels.length; i++) {
             if (message.channel == bannedChannels[i]) {
+                return;
+            }
+        }
+
+        // Check banned users
+        for (let i = 0; i < bannedUsers.length; i++) {
+            if (message.author.id == bannedUsers[i]) {
                 return;
             }
         }
@@ -28,24 +51,72 @@ module.exports = {
         if (isChattingWith.length > 0) {
 
             for (let i = 0; i < isChattingWith.length; i++) {
-                if (isChattingWith[i] === message.author.id) {
+                if (isChattingWith[i].userId === message.author.id) {
                     hasConversation = true;
 
+                    // Order on enum order
+                    switch (isChattingWith[i].type) {
+                        case ConversationType.None:
+                            break;
+                        case ConversationType.AskedMood:
+                            // Get Users Mood on reply ^
+                            if (parsedMessage.includes('good') || parsedMessage.includes('great') || parsedMessage.includes('amazing') || parsedMessage.includes('fenominal')) {
+                                message.channel.send("I love to hear that!");
+                                isChattingWith[i].type = ConversationType.None;
+                            }
+
+                            if (parsedMessage.includes('fine') || parsedMessage.includes('okay')) {
+                                message.channel.send("Good to hear!");
+                                isChattingWith[i].type = ConversationType.None;
+                            }
+
+                            if (parsedMessage.includes('bad')) {
+                                message.channel.send("Aw, anything I can help with?");
+                                isChattingWith[i].type = ConversationType.AskedForHelp;
+                            }
+
+                            break;
+                        case ConversationType.AskedForHelp:
+                            if (YesNoQuestion(parsedMessage)) {
+                                message.channel.send("Maybe the /mochi command can cheer you up!");
+                            } else {
+                                message.channel.send("Okie, I'm here if you need a big hug!");
+                            }
+
+                            isChattingWith[i].type = ConversationType.None;
+                            break;
+                        case ConversationType.AskedForHelpConfirmed:
+                            break;
+                    }
+
+                    // Stop Conversation
+                    if (parsedMessage.includes('bye floofy')) {
+                        StopConversation(message);
+                    }
+
+                    // Other
                     if (parsedMessage.includes('how are you')) {
-                        message.channel.send("I am fluffy as always! How about you ^-^");
+                        message.channel.send(GetFloofyMood());
+                        isChattingWith[i].type = ConversationType.AskedMood;
                     }
 
-                    // Get Users Mood on reply ^
-                    if (parsedMessage.includes('good') || parsedMessage.includes('great') || parsedMessage.includes('amazing') || parsedMessage.includes('fenominal')) {
-                        message.channel.send("I love to hear that!");
+                    // Asked for activity
+
+                    // Ask for game
+                    if (parsedMessage.includes('play') && parsedMessage.includes('game')) {
+                        message.channel.send('Yes! Choose a game and I will destr... play with you! ^^\n[INFO] There are sadly no games atm :(');
                     }
 
-                    if (parsedMessage.includes('fine') || parsedMessage.includes('okay')) {
-                        message.channel.send("Good to hear!");
+                    // Ask for a hug
+                    if (parsedMessage.includes('hug')) {
+                        message.reply('https://tenor.com/view/hugs-sending-virtual-hugs-loading-gif-8158818');
                     }
 
-                    if (parsedMessage.includes('bad')) {
-                        message.channel.send("Aw, anything I can help with?");
+                    // User thanks
+                    if (parsedMessage.includes('thank')) {
+                        if (parsedMessage.includes('thanks') || parsedMessage.includes('you')) {
+                            message.channel.send('No problem ^^');
+                        }
                     }
                 }
             }
@@ -53,13 +124,53 @@ module.exports = {
 
         if (parsedMessage.includes('floofy')) {
 
-            // Stop Conversation
-            if (parsedMessage.includes('bye')) {
-                StopConversation(message);
+            // <Mood> //
+            if (parsedMessage.includes('bad floofy')) {
+                newMessage += "I'm sowwy :(";
             }
 
+            if (parsedMessage.includes('good floofy')) {
+                newMessage += "Yay! Thank you ^^";
+            }
+
+            if (parsedMessage.includes('i love you')) {
+                switch (Math.floor(Math.random() * (2 - 0))) {
+                    case 0:
+                        newMessage += "Aww, I love you too <3";
+                        break;
+                    case 1:
+                        newMessage += "I love you even more ^^";
+                        break;
+                }
+            }
+            // </Mood> //
+
+
+            // <Vibes> //
+            if (parsedMessage.includes('do you love me')) {
+                newMessage += "I weawwy love you!";
+            }
+
+            if (parsedMessage.includes('goodnight ')) {
+                newMessage += "Sleep happy!";
+            }
+            // </Vibes> //
+
+            // <Questions> //
+            if (parsedMessage.includes('bedtime')) {
+                newMessage += "I sleep from <t:1652650200:t> till <t:1652603400:t>";
+            }
+            // </Questions> //
+
+            // <Other> //
+            if (parsedMessage.includes('thanks ')) {
+                newMessage += "No problem ^^";
+            }
+            // </Other> //
+
+
             // Start a conversation with floofy
-            if (parsedMessage.includes('hewwo') || parsedMessage.includes('hello') || parsedMessage.includes('hi') || parsedMessage.includes('hey')) {
+            if (parsedMessage.includes('hewwo ') || parsedMessage.includes('hello ') || parsedMessage.includes('hi ') || parsedMessage.includes('hey ')) {
                 newMessage += "Hewwo fwiend :D\n";
 
                 AddConversation(message);
@@ -72,7 +183,14 @@ module.exports = {
             if (parsedMessage.includes('how are you') && !hasConversation) {
                 newMessage += "I am fluffy as always! How about you ^-^";
 
-                AddConversation(message.author.id);
+                AddConversation(message);
+
+                // Add conversationtype
+                for (let i = 0; i < isChattingWith.length; i++) {
+                    if (isChattingWith[i].userId == message.author.id) {
+                        isChattingWith[i].type = ConversationType.AskedMood;
+                    }
+                }
             }
 
             if (parsedMessage.includes('come here')) {
@@ -91,25 +209,26 @@ module.exports = {
             if (parsedMessage.includes('right')) {
                 newMessage += "Yes :D";
             }
-        }
-
-        if (parsedMessage == "<@969258604844711976>") {
-            message.channel.send("Floofy is here for you!");
+        } else {
+            if (parsedMessage == "<@969258604844711976>") {
+                message.channel.send("Floofy is here for you!");
+            }
         }
 
         // Send Final Message
         if (newMessage != '') {
             message.channel.send(newMessage);
-        } else {
-            // Add to file
-            const fs = require('fs');
-
-            fs.writeFile('../data/floofymentions.txt', (message.author.id + ': ' + parsedMessage), error => {
-                if (error) {
-                    console.error(error);
-                }
-            });
         }
+        /*else {
+                   // Add to file
+                   const fs = require('fs');
+
+                   fs.appendFile('./data/floofymentions.txt', (message.author.id + ': ' + parsedMessage + '\n'), error => {
+                       if (error) {
+                           console.error(error);
+                       }
+                   });
+               }*/
     },
 };
 
@@ -120,8 +239,8 @@ function AddConversation(message) {
     if (isChattingWith.length > 0) {
 
         for (let i = 0; i < isChattingWith.length; i++) {
-            if (isChattingWith[i] === message.author.id) {
-                isChattingWith = true;
+            if (isChattingWith[i].userId === message.author.id) {
+                isAlreadyPresent = true;
                 break;
             }
         }
@@ -129,19 +248,42 @@ function AddConversation(message) {
 
     // Add User
     if (!isAlreadyPresent) {
-        isChattingWith.push(message.author.id);
-        message.channel.send("You can end our conversation with, bye floofy\n");
+        isChattingWith.push(new Conversation(message.author.id, ""));
+        message.channel.send("You can end our conversation with, `bye floofy`\n");
     }
 }
 
 function StopConversation(message) {
     if (isChattingWith.length > 0) {
         for (let i = 0; i < isChattingWith.length; i++) {
-            if (isChattingWith[i] === message.author.id) {
+            if (isChattingWith[i].userId === message.author.id) {
                 isChattingWith.splice(i, 1);
-                message.channel.send("Good bye!");
+                switch (Math.floor(Math.random() * (3 - 0))) {
+                    case 0:
+                        message.channel.send("Good bye fwiend!");
+                        break;
+                    case 1:
+                        message.channel.send("It was lovely chatting with you! Byee <3");
+                        break;
+                    case 2:
+                        message.channel.send("Goodbye, we should talk again some time ^^");
+                        break;
+                }
+
                 break;
             }
         }
     }
+}
+
+function YesNoQuestion(message) {
+    if (message.includes('yes') || message.includes('sure') || message.includes('okay')) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function GetFloofyMood() {
+    return 'I am fluffy as always! How about you ^-^';
 }

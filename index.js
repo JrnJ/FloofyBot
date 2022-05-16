@@ -12,11 +12,12 @@ const {
 // Create a new client instance
 const client = new Client({
 	intents: [
-		Intents.FLAGS.GUILDS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_MESSAGES,
+		Intents.FLAGS.GUILDS,
+		Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_MESSAGES,
 	],
 	partials: [
 		'MESSAGE', 'REACTION',
-		'CHANNEL',
+		'CHANNEL', 'USER', ''
 	]
 });
 
@@ -45,6 +46,16 @@ for (const file of eventFiles) {
 
 // When the client is ready, run this code (only once)
 client.once('ready', () => {
+	// Set Status
+	// client.user.setActivity("with depression", {
+	// 	type: "WATCHING",
+	// 	name: "cat videos"
+	// });
+
+	client.user.setActivity('with my plushie :)', {
+		type: 'PLAYING'
+	});
+
 	console.log('Ready!');
 });
 

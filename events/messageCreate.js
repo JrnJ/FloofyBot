@@ -5,12 +5,13 @@ class Conversation {
     }
 };
 
-// Conversation Types
-const ConversationType = {
-    None: 0,
-    AskedMood: 1,
-    AskedForHelp: 2
-}
+class Insulted {
+    constructor(userId, username, swearword) {
+        this.userId = userId;
+        this.username = username;
+        this.swearword = swearword;
+    }
+};
 
 const {
     clientId,
@@ -19,8 +20,37 @@ const {
     ownerId
 } = require('../config.json');
 
+// Conversation Types
+const ConversationType = {
+    None: 0,
+    AskedMood: 1,
+    AskedForHelp: 2
+}
+
+// Insult Types
+const InsultType = {
+    Insulted: 0
+}
+
+// Swearword list - A-Z
+const Swearwords = [
+    'cunt','cock',
+    'dick',
+    'faggot', 'fuck', 
+    'nigger', 'nigga',
+    'whore',
+]
+
+// FLoofy Mood
+const FloofyMood = {
+    Normal: 0,
+    Happy: 1,
+    Insulted: 2
+}
+
 // Container of user id's the bot is having a conversation with
 let isChattingWith = [];
+let mood = [];
 
 module.exports = {
     name: 'messageCreate',
@@ -47,6 +77,16 @@ module.exports = {
         const parsedMessage = message.content.toLowerCase();
         let newMessage = '';
         let hasConversation = false;
+
+        // Follow up for chats
+        if (parsedMessage.includes('floofy')) {
+            // Start a conversation with floofy
+            if (parsedMessage.includes('hewwo ') || parsedMessage.includes('hello ') || parsedMessage.includes('hi ') || parsedMessage.includes('hey ')) {
+                AddConversation(message);
+
+                message.channel.send('Hewwo fwiend :D\n');
+            }
+        }
 
         if (isChattingWith.length > 0) {
 
@@ -100,6 +140,21 @@ module.exports = {
                         isChattingWith[i].type = ConversationType.AskedMood;
                     }
 
+                    // Asking for help
+                    if (parsedMessage.includes('help')) {
+                        if (parsedMessage.includes('i')) {
+                            if (parsedMessage.includes('need') || parsedMessage.includes('want') || parsedMessage.includes('could use')) {
+                                message.reply('How can I help you ^^');
+                                isChattingWith[i].type = ConversationType.AskedForHelp;
+                            }
+                        } else {
+                            if (parsedMessage.includes('help me')) {
+                                message.reply('How can I help you ^^');
+                                isChattingWith[i].type = ConversationType.AskedForHelp;
+                            }
+                        }
+                    }
+
                     // Asked for activity
 
                     // Ask for game
@@ -143,12 +198,36 @@ module.exports = {
                         break;
                 }
             }
+
+            // Check for swearwords
+            const gotCalled = ContainsSwearword(parsedMessage);
+            if (gotCalled != '') {
+                if (parsedMessage.includes('you') || parsedMessage.includes('is a') || parsedMessage.includes('is the') || parsedMessage.includes('do be')) {
+                    mood.push(new Insulted(message.author.id, message.author.username, gotCalled));
+                    message.reply('How can you be so rude :sob:');
+                } /*else { 
+                    message.reply('Please don\'t swear :(');
+                } */
+            }
+
+            // User said sorry
+            if (parsedMessage.includes('sorry') && parsedMessage.includes('i')) {
+                if (!parsedMessage.includes('not sorry')) {
+                    for (let i = 0; i < mood.length; i++) {
+                        if (mood[i].userId == message.author.id) {
+                            mood.splice(i, 1);
+                            newMessage += "It's fine, but dont do it again :(";
+                            break;
+                        }
+                    }
+                }
+            }
             // </Mood> //
 
 
             // <Vibes> //
             if (parsedMessage.includes('do you love me')) {
-                newMessage += "I weawwy love you!";
+                newMessage += 'I weawwy love you!';
             }
 
             if (parsedMessage.includes('goodnight ')) {
@@ -167,14 +246,6 @@ module.exports = {
                 newMessage += "No problem ^^";
             }
             // </Other> //
-
-
-            // Start a conversation with floofy
-            if (parsedMessage.includes('hewwo ') || parsedMessage.includes('hello ') || parsedMessage.includes('hi ') || parsedMessage.includes('hey ')) {
-                newMessage += "Hewwo fwiend :D\n";
-
-                AddConversation(message);
-            }
 
             if (parsedMessage.includes('who is floofy')) {
                 message.channel.send('I\'m a fluffy bot made by **Jeroen** for the purpose of bringing happiness and good vibes!'); // #7522
@@ -199,10 +270,6 @@ module.exports = {
 
             if (parsedMessage.includes('come here')) {
                 newMessage += "Where O.O";
-            }
-
-            if (parsedMessage.includes('i wouwd love for you to encouwage me for my test tomowwow')) {
-                newMessage += "Vaitzy waitzy you got this in the bag!\nYou can dowo this and will get a vewwy good gwade tomowwow. Twust mwe :D";
             }
 
             // Also check if right is before or after floofy
@@ -285,5 +352,29 @@ function YesNoQuestion(message) {
 }
 
 function GetFloofyMood() {
-    return 'I am fluffy as always! How about you ^-^';
+    if (mood.length > 0) {
+        // return 'I am very sad after ' + mood[0].username + ' called me a ' + mood[0].swearword + ' :('; // Agressive
+        return 'I am very sad after ' + mood[0].username + ' called me bad things :('; // Normal
+    } else {
+        return 'I am fluffy as always! How about you ^-^';
+    }
+}
+
+function ContainsSwearword(message) {
+    let gotCalled = "";
+    let insultAmounts = 0;
+
+    for (let i = 0; i < Swearwords.length; i++) {
+        if (message.includes(Swearwords[i])) {
+            gotCalled += Swearwords[i] + ', ';
+            insultAmounts++;
+        }
+    }
+    gotCalled.slice(0, -2);
+
+    if (insultAmounts > 1) {
+        // Look for last , replace with ` and a`
+    }
+
+    return gotCalled;
 }

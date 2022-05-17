@@ -16,8 +16,7 @@ class Insulted {
 const {
     clientId,
     bannedChannels,
-    bannedUsers,
-    ownerId
+    bannedUsers
 } = require('../config.json');
 
 // Conversation Types

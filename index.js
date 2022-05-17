@@ -17,7 +17,7 @@ const client = new Client({
 	],
 	partials: [
 		'MESSAGE', 'REACTION',
-		'CHANNEL', 'USER', ''
+		'CHANNEL', 'USER',
 	]
 });
 
@@ -44,14 +44,9 @@ for (const file of eventFiles) {
 	}
 }
 
-// When the client is ready, run this code (only once)
+// When the client is ready
 client.once('ready', () => {
 	// Set Status
-	// client.user.setActivity("with depression", {
-	// 	type: "WATCHING",
-	// 	name: "cat videos"
-	// });
-
 	client.user.setActivity('with my plushie :)', {
 		type: 'PLAYING'
 	});

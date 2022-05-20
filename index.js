@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const {
 	Client,
 	Collection,
-	Intents
+	Intents,
 } = require('discord.js');
 const {
 	token

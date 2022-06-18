@@ -18,9 +18,16 @@ module.exports = {
                 .setRequired(true)),
 
 	async execute(interaction) {
+
+		const term = interaction.options.getString('username');
+		const query = new URLSearchParams({
+			term
+		});
+
+		console.log(query);
 		await interaction.deferReply();
 
-        interaction.editReply(interaction.option[0]); //
+        // interaction.editReply(interaction.option[0]); //
     },
 };
 /*

@@ -1,38 +1,51 @@
-// Include Nodejs' net module.
 const Net = require('node:net');
 
-// Server data
 const port = 18600;
 const ip = '127.0.0.1';
+let isRunning = false;
 
 // Create Server
-const server = new Net.createServer((client) => {
-    // 'connection' listener.
-    console.log('Client Connected');
+let Server = new Net.Server();
 
-    client.on('end', () => {
-        console.log('Client Disconnected');
-    });
+function StartServer() {
+    console.log("Hello there");
 
-    client.on('data', (data) => {
-        console.log(String.fromCharCode(...data));
-    });
+    if (!isRunning) {
+        Server = new Net.createServer((client) => {
+            // 'connection' listener.
+            console.log('Client Connected');
 
-    client.pipe(client);
-});
+            client.on('end', () => {
+                console.log('Client Disconnected');
+            });
+
+            client.on('data', (data) => {
+                const message = String.fromCharCode(...data);
+
+                // Send to channel
+                interaction.channel.send(message);
+            });
+
+            client.pipe(client);
+        });
+    }
+}
 
 // The server listens to a socket for a client to make a connection request.
 // Think of a socket as an end point.
-server.listen(port, ip, () => {
-    console.log(`Server listening on ${ip}:${port}`);
-});
+// Server.listen(port, ip, () => {
+//     console.log(`Server listening on ${ip}:${port}`);
+// });
 
-// Catch Data
-server.on('data', (data) => {
-    console.log(data);
-});
+// // Catch Data
+// Server.on('data', (data) => {
+//     console.log(data);
+// });
 
-// Catch Errors
-server.on('error', (err) => {
-    console.log(err);
-});
+// // Catch Errors
+// Server.on('error', (err) => {
+//     console.log(err);
+// });
+
+module.exports.Server = Server;
+module.exports.StartServer = StartServer;

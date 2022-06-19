@@ -19,11 +19,27 @@ const {
     bannedUsers
 } = require('../config.json');
 
+const {
+    AudioPlayer,
+    Play,
+    Pause,
+    Resume,
+    Stop,
+    SetVolume,
+    JoinVoiceChannel,
+    DisconnectFromVoiceChannel,
+    IsBotInChannel
+} = require('../MusicPlayer.js');
+const {
+    AudioPlayerState
+} = require('@discordjs/voice');
+
 // Conversation Types
 const ConversationType = {
     None: 0,
     AskedMood: 1,
-    AskedForHelp: 2
+    AskedForHelp: 2,
+    Music: 3
 }
 
 // Insult Types
@@ -33,9 +49,9 @@ const InsultType = {
 
 // Swearword list - A-Z
 const Swearwords = [
-    'cunt','cock',
+    'cunt', 'cock',
     'dick',
-    'faggot', 'fuck', 
+    'faggot', 'fuck',
     'nigger', 'nigga',
     'whore',
 ]
@@ -60,11 +76,11 @@ module.exports = {
         }
 
         // Check banned channels
-        for (let i = 0; i < bannedChannels.length; i++) {
-            if (message.channel == bannedChannels[i]) {
-                return;
-            }
-        }
+        // for (let i = 0; i < bannedChannels.length; i++) {
+        //     if (message.channel == bannedChannels[i]) {
+        //         return;
+        //     }
+        // }
 
         // Check banned users
         for (let i = 0; i < bannedUsers.length; i++) {
@@ -126,6 +142,43 @@ module.exports = {
                             break;
                         case ConversationType.AskedForHelpConfirmed:
                             break;
+                        case ConversationType.Music:
+                            if (parsedMessage.includes('play')) {
+                                // if (AudioPlayer.state == AudioPlayerState.AudioPlayerPausedState) {
+                                //     Resume();
+                                // } else {
+                                //     Play('Grow Slowly.mp3');
+                                // }
+
+                                if (!IsBotInChannel(message.guild.id)) {
+                                    JoinVoiceChannel(message.member.voice.channel.id, message.guild.id, message.guild.voiceAdapterCreator);
+                                } 
+
+                                // if (AudioPlayer.state == AudioPlayerState.AudioPlayerPausedState) {
+                                //     console.log("playing music");
+                                // }
+
+                                Play('Grow Slowly.mp3');
+                                newMessage += 'Playing ' + 'Grow Slowly';
+                            }
+
+                            if (parsedMessage.includes('pause')) {
+                                Pause();
+                            }
+
+                            if (parsedMessage.includes('resume')) {
+                                Resume();
+                            }
+
+                            if (parsedMessage.includes('stop')) {
+                                Stop();
+                                DisconnectFromVoiceChannel(message.guild.id);
+                            }
+
+                            if (parsedMessage.includes('volume')) {
+                                //SetVolume();
+                            }
+                            break;
                     }
 
                     // Stop Conversation
@@ -133,6 +186,13 @@ module.exports = {
                         StopConversation(message);
                     }
 
+                    // Music
+                    if (parsedMessage.includes('music')) {
+                        console.log("uhm");
+                        isChattingWith[i].type = ConversationType.Music;
+                        message.reply('Listening to voice commands from ' + message.author.username + ' in ' + 'every channel for now :}');
+                    }
+                   
                     // Other
                     if (parsedMessage.includes('how are you')) {
                         message.channel.send(GetFloofyMood());
@@ -204,9 +264,10 @@ module.exports = {
                 if (parsedMessage.includes('you') || parsedMessage.includes('is a') || parsedMessage.includes('is the') || parsedMessage.includes('do be')) {
                     mood.push(new Insulted(message.author.id, message.author.username, gotCalled));
                     message.reply('How can you be so rude :sob:');
-                } /*else { 
-                    message.reply('Please don\'t swear :(');
-                } */
+                }
+                /*else { 
+                                   message.reply('Please don\'t swear :(');
+                               } */
             }
 
             // User said sorry

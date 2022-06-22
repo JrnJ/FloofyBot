@@ -8,6 +8,9 @@ const {
 const {
 	token
 } = require('./config.json');
+const {
+	GetMusic
+} = require('./MusicPlayer.js');
 
 // Create a new client instance
 const client = new Client({
@@ -51,6 +54,7 @@ client.once('ready', () => {
 	client.user.setActivity('with my plushie :)', {
 		type: 'PLAYING'
 	});
+	GetMusic();
 
 	console.log('Ready!');
 });

@@ -28,7 +28,8 @@ const {
     SetVolume,
     JoinVoiceChannel,
     DisconnectFromVoiceChannel,
-    IsBotInChannel
+    IsBotInChannel,
+    SearchAndPlay
 } = require('../MusicPlayer.js');
 const {
     AudioPlayerState
@@ -143,23 +144,13 @@ module.exports = {
                         case ConversationType.AskedForHelpConfirmed:
                             break;
                         case ConversationType.Music:
-                            if (parsedMessage.includes('play')) {
-                                // if (AudioPlayer.state == AudioPlayerState.AudioPlayerPausedState) {
-                                //     Resume();
-                                // } else {
-                                //     Play('Grow Slowly.mp3');
-                                // }
-
+                            if (parsedMessage.includes('play ') && parsedMessage.charAt(0) == 'p') {
                                 if (!IsBotInChannel(message.guild.id)) {
                                     JoinVoiceChannel(message.member.voice.channel.id, message.guild.id, message.guild.voiceAdapterCreator);
                                 } 
 
-                                // if (AudioPlayer.state == AudioPlayerState.AudioPlayerPausedState) {
-                                //     console.log("playing music");
-                                // }
-
-                                Play('Grow Slowly.mp3');
-                                newMessage += 'Playing ' + 'Grow Slowly';
+                                const playMessage = SearchAndPlay(parsedMessage.split('play ')[1]);
+                                newMessage += playMessage;
                             }
 
                             if (parsedMessage.includes('pause')) {
@@ -176,6 +167,15 @@ module.exports = {
                             }
 
                             if (parsedMessage.includes('volume')) {
+                                if (parsedMessage.includes('default')) {
+                                    SetVolume(0.05);
+                                } else {
+
+                                }
+                                //SetVolume();
+                            }
+
+                            if (parsedMessage.includes('forward')) {
                                 //SetVolume();
                             }
                             break;

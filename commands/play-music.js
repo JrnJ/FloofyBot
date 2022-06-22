@@ -2,7 +2,9 @@ const {
     SlashCommandBuilder
 } = require('@discordjs/builders');
 const {
-    Play
+    IsBotInChannel,
+    JoinVoiceChannel,
+    SearchAndPlay
 } = require('../MusicPlayer.js');
 
 module.exports = {
@@ -22,9 +24,13 @@ module.exports = {
                 term
             });
 
-            Play(path.get('term'));
+            if (!IsBotInChannel(interaction.guild.id)) {
+                JoinVoiceChannel(interaction.member.voice.channel.id, interaction.guild.id, interaction.guild.voiceAdapterCreator); 
+            }
 
-            await interaction.reply("Playing music");
+            const message = SearchAndPlay(path.get('term'));
+
+            await interaction.reply(message);
         } else {
             await interaction.reply("User is not connect to a voice channel!");
         }

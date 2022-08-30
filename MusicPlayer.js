@@ -32,6 +32,7 @@ class Song {
 let Resource;
 let Volume = 0.05;
 let Songs = [];
+let Queue = [];
 
 function Play(path) {
     // Stop Player First

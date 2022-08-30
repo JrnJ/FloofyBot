@@ -14,6 +14,10 @@ class Insulted {
 };
 
 const {
+    MessageEmbed
+} = require('discord.js');
+
+const {
     clientId,
     bannedChannels,
     bannedUsers
@@ -104,6 +108,41 @@ module.exports = {
             }
         }
 
+        if (parsedMessage.includes('queue')) {
+            //const queue = GetQueue();
+
+            // const queueEmbed = new MessageEmbed()
+            //     .setColor('#C58153')
+            //     .setTitle('Music Queue')
+            //     .addFields(
+            //         { name: 'Some random field', value: 'with a value' }
+            //     )
+            //     .addField('My Field');
+
+            // message.channel.send({
+            //     embeds: [queueEmbed]
+            // });
+
+            // for (let i = 0; i < queue.length; i++) {
+
+            // }
+
+            const songQueue = new MessageEmbed()
+                .setColor('#C58153')
+                .setTitle('Queue: ' + 0 + ' songs')
+                .addFields({
+                    name: 'Now Playing',
+                    value: 'Grow Slowly'
+                }, {
+                    name: '\u200b',
+                    value: '`hello`'
+                })
+
+            message.channel.send({
+                embeds: [songQueue]
+            });
+        }
+
         if (isChattingWith.length > 0) {
 
             for (let i = 0; i < isChattingWith.length; i++) {
@@ -147,7 +186,7 @@ module.exports = {
                             if (parsedMessage.includes('play ') && parsedMessage.charAt(0) == 'p') {
                                 if (!IsBotInChannel(message.guild.id)) {
                                     JoinVoiceChannel(message.member.voice.channel.id, message.guild.id, message.guild.voiceAdapterCreator);
-                                } 
+                                }
 
                                 const playMessage = SearchAndPlay(parsedMessage.split('play ')[1]);
                                 newMessage += playMessage;
@@ -159,6 +198,10 @@ module.exports = {
 
                             if (parsedMessage.includes('resume')) {
                                 Resume();
+                            }
+
+                            if (parsedMessage.includes('skip')) {
+                                // Skip();
                             }
 
                             if (parsedMessage.includes('stop')) {
@@ -192,7 +235,7 @@ module.exports = {
                         isChattingWith[i].type = ConversationType.Music;
                         message.reply('Listening to voice commands from ' + message.author.username + ' in ' + 'every channel for now :}');
                     }
-                   
+
                     // Other
                     if (parsedMessage.includes('how are you')) {
                         message.channel.send(GetFloofyMood());
@@ -328,10 +371,6 @@ module.exports = {
                 newMessage += "Where O.O";
             }
 
-            if (parsedMessage.includes('come here')) {
-                newMessage += "Where O.O";
-            }
-
             // Also check if right is before or after floofy
             if (parsedMessage.includes('right')) {
                 newMessage += "Yes :D";
@@ -341,6 +380,18 @@ module.exports = {
                 message.channel.send("Floofy is here for you!");
             }
         }
+
+        // if (parsedMessage.includes('delete')) {
+
+        //     const messageId = parsedMessage.split('floofy delete ')[1];
+
+        //     message.channel.messages.fetch(messageId)
+        //         .then(msg => {
+        //             msg.delete();
+        //         });
+
+        //     message.delete();
+        // }
 
         // Send Final Message
         if (newMessage != '') {
